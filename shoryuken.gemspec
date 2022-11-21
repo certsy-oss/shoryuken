@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'shoryuken/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'shoryuken-dev'
+  spec.name          = 'shoryuken'
   spec.version       = Shoryuken::VERSION
   spec.authors       = ['Pablo Cantero']
   spec.email         = ['pablo@pablocantero.com']
