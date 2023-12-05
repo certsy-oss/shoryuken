@@ -16,11 +16,13 @@ module Shoryuken
     def stop!
       initiate_stop
 
+      # Don't await here so the timeout below is not delayed
+      stop_new_dispatching
+
       executor.shutdown
+      executor.kill unless executor.wait_for_termination(Shoryuken.options[:timeout])
 
-      return if executor.wait_for_termination(Shoryuken.options[:timeout])
-
-      executor.kill
+      fire_event(:stopped)
     end
 
     def stop
@@ -33,6 +35,8 @@ module Shoryuken
 
       executor.shutdown
       executor.wait_for_termination
+
+      fire_event(:stopped)
     end
 
     def healthy?

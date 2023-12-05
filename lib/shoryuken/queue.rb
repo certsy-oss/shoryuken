@@ -21,9 +21,10 @@ module Shoryuken
     end
 
     def delete_messages(options)
-      client.delete_message_batch(
+      failed_messages = client.delete_message_batch(
         options.merge(queue_url: url)
-      ).failed.any? do |failure|
+      ).failed || []
+      failed_messages.any? do |failure|
         logger.error do
           "Could not delete #{failure.id}, code: '#{failure.code}', message: '#{failure.message}', sender_fault: #{failure.sender_fault}"
         end
@@ -43,7 +44,8 @@ module Shoryuken
     end
 
     def receive_messages(options)
-      client.receive_message(options.merge(queue_url: url)).messages.map { |m| Message.new(client, self, m) }
+      messages = client.receive_message(options.merge(queue_url: url)).messages || []
+      messages.map { |m| Message.new(client, self, m) }
     end
 
     def fifo?

@@ -57,4 +57,49 @@ RSpec.describe Shoryuken::Launcher do
       end
     end
   end
+
+  describe '#stop' do
+    before do
+      allow(first_group_manager).to receive(:stop_new_dispatching)
+      allow(first_group_manager).to receive(:await_dispatching_in_progress)
+      allow(second_group_manager).to receive(:stop_new_dispatching)
+      allow(second_group_manager).to receive(:await_dispatching_in_progress)
+    end
+
+    it 'fires quiet, shutdown and stopped event' do
+      allow(subject).to receive(:fire_event)
+      subject.stop
+      expect(subject).to have_received(:fire_event).with(:quiet, true)
+      expect(subject).to have_received(:fire_event).with(:shutdown, true)
+      expect(subject).to have_received(:fire_event).with(:stopped)
+    end
+
+    it 'stops the managers' do
+      subject.stop
+      expect(first_group_manager).to have_received(:stop_new_dispatching)
+      expect(second_group_manager).to have_received(:stop_new_dispatching)
+    end
+  end
+
+  describe '#stop!' do
+    before do
+      allow(first_group_manager).to receive(:stop_new_dispatching)
+      allow(first_group_manager).to receive(:await_dispatching_in_progress)
+      allow(second_group_manager).to receive(:stop_new_dispatching)
+      allow(second_group_manager).to receive(:await_dispatching_in_progress)
+    end
+
+    it 'fires shutdown and stopped event' do
+      allow(subject).to receive(:fire_event)
+      subject.stop!
+      expect(subject).to have_received(:fire_event).with(:shutdown, true)
+      expect(subject).to have_received(:fire_event).with(:stopped)
+    end
+
+    it 'stops the managers' do
+      subject.stop!
+      expect(first_group_manager).to have_received(:stop_new_dispatching)
+      expect(second_group_manager).to have_received(:stop_new_dispatching)
+    end
+  end
 end
